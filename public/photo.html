@@ -69,18 +69,6 @@
       color: var(--text-dark);
     }
 
-    .main {
-      width: 900px;
-      max-width: 95vw;
-      margin: 20px auto;
-      background-color: transparent;
-      padding: 0;
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
-    }
 
     .gallery {
       display: flex;
@@ -157,11 +145,10 @@
   </style>
 </head>
 <body>
-  <div class="main">
     <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
     <h1>Captured Photos</h1>
     <div class="gallery" id="gallery"></div>
-  </div>
+  
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -225,4 +212,3 @@
   </script>
 </body>
 </html>
-
