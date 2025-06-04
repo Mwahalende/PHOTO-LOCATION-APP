@@ -65,7 +65,7 @@
       border-color: var(--button-bg-dark);
     }
 
-    #captureBtn {
+    #captureBtn, #galleryBtn {
       margin-top: 25px;
       padding: 14px 32px;
       font-size: 18px;
@@ -76,16 +76,17 @@
       cursor: pointer;
       user-select: none;
       transition: background-color 0.3s;
+      margin-right: 15px;
     }
 
-    #captureBtn:hover {
+    #captureBtn:hover, #galleryBtn:hover {
       background-color: var(--button-hover-light);
     }
 
-    body.dark #captureBtn {
+    body.dark #captureBtn, body.dark #galleryBtn {
       background-color: var(--button-bg-dark);
     }
-    body.dark #captureBtn:hover {
+    body.dark #captureBtn:hover, body.dark #galleryBtn:hover {
       background-color: var(--button-hover-dark);
     }
 
@@ -116,17 +117,6 @@
     body.dark #toggleThemeBtn:hover {
       color: var(--text-dark);
     }
-
-    #preview {
-      margin-top: 30px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      max-width: 90vw;
-      width: 450px;
-      height: auto;
-      display: none;
-      user-select: none;
-    }
   </style>
 </head>
 <body>
@@ -141,8 +131,7 @@
 
   <br />
   <button id="captureBtn">Capture Photo</button>
-
-  <img id="preview" alt="Captured Photo Preview" />
+  <button id="galleryBtn" onclick="location.href='photo.html'">View Gallery</button>
 
   <script>
     const locationDiv = document.getElementById("location");
@@ -150,7 +139,6 @@
     const video = document.getElementById("video");
     const canvas = document.getElementById("canvas");
     const captureBtn = document.getElementById("captureBtn");
-    const previewImg = document.getElementById("preview");
     const toggleThemeBtn = document.getElementById("toggleThemeBtn");
 
     let latitude = "", longitude = "", placename = "";
@@ -203,8 +191,7 @@
       ctx.drawImage(video, 0, 0);
 
       canvas.toBlob(blob => {
-        previewImg.src = URL.createObjectURL(blob);
-        previewImg.style.display = "block";
+        // We do not show any preview image per your request
 
         const formData = new FormData();
         formData.append("photo", blob, "photo.png");
