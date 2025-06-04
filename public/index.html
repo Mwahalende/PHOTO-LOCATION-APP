@@ -65,10 +65,10 @@
       border-color: var(--button-bg-dark);
     }
 
-    #captureBtn, #galleryBtn {
-      margin-top: 25px;
-      padding: 14px 32px;
-      font-size: 18px;
+    #captureBtn, #galleryBtn, #switchCameraBtn {
+      margin-top: 20px;
+      padding: 12px 28px;
+      font-size: 16px;
       background-color: var(--button-bg-light);
       border: none;
       border-radius: 10px;
@@ -76,17 +76,18 @@
       cursor: pointer;
       user-select: none;
       transition: background-color 0.3s;
-      margin-right: 15px;
+      margin-right: 10px;
     }
 
-    #captureBtn:hover, #galleryBtn:hover {
+    #captureBtn:hover, #galleryBtn:hover, #switchCameraBtn:hover {
       background-color: var(--button-hover-light);
     }
 
-    body.dark #captureBtn, body.dark #galleryBtn {
+    body.dark #captureBtn, body.dark #galleryBtn, body.dark #switchCameraBtn {
       background-color: var(--button-bg-dark);
     }
-    body.dark #captureBtn:hover, body.dark #galleryBtn:hover {
+
+    body.dark #captureBtn:hover, body.dark #galleryBtn:hover, body.dark #switchCameraBtn:hover {
       background-color: var(--button-hover-dark);
     }
 
@@ -117,29 +118,31 @@
     body.dark #toggleThemeBtn:hover {
       color: var(--text-dark);
     }
-    .main{
-    height: auto;
-    padding: 0px;
-    width: 100%;
+
+    .main {
+      height: auto;
+      padding: 0px;
+      width: 100%;
     }
   </style>
 </head>
 <body>
   <div class="main">
-  <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
+    <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
 
-  <h1>Capture Photo with Location</h1>
-  <div id="location">Getting location...</div>
-  <div id="place"></div>
+    <h1>Capture Photo with Location</h1>
+    <div id="location">Getting location...</div>
+    <div id="place"></div>
 
-  <video id="video" autoplay playsinline></video>
-  <canvas id="canvas"></canvas>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
 
-  <br />
-  <button id="captureBtn">Capture Photo</button>
-  <button id="galleryBtn" onclick="location.href='photo.html'">View Gallery</button>
-
+    <br />
+    <button id="switchCameraBtn">Switch Camera</button>
+    <button id="captureBtn">Capture Photo</button>
+    <button id="galleryBtn" onclick="location.href='photo.html'">View Gallery</button>
   </div>
+
   <script>
     const locationDiv = document.getElementById("location");
     const placeDiv = document.getElementById("place");
@@ -147,8 +150,11 @@
     const canvas = document.getElementById("canvas");
     const captureBtn = document.getElementById("captureBtn");
     const toggleThemeBtn = document.getElementById("toggleThemeBtn");
+    const switchCameraBtn = document.getElementById("switchCameraBtn");
 
     let latitude = "", longitude = "", placename = "";
+    let currentFacingMode = "environment";
+    let stream;
 
     function setTheme(dark) {
       if (dark) {
@@ -187,9 +193,26 @@
       locationDiv.textContent = "Location access denied.";
     });
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => video.srcObject = stream)
-      .catch(() => alert("Camera access denied."));
+    async function startCamera(facingMode) {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { exact: facingMode } },
+          audio: false
+        });
+        video.srcObject = stream;
+      } catch (err) {
+        alert("Unable to access camera. Please check permissions.");
+      }
+    }
+
+    switchCameraBtn.addEventListener("click", () => {
+      currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+      startCamera(currentFacingMode);
+    });
 
     captureBtn.addEventListener("click", () => {
       const ctx = canvas.getContext("2d");
@@ -198,8 +221,6 @@
       ctx.drawImage(video, 0, 0);
 
       canvas.toBlob(blob => {
-        // We do not show any preview image per your request
-
         const formData = new FormData();
         formData.append("photo", blob, "photo.png");
         formData.append("latitude", latitude);
@@ -218,7 +239,11 @@
         .catch(() => alert("Failed to upload photo."));
       }, "image/png");
     });
+
+    // Start camera on page load
+    startCamera(currentFacingMode);
   </script>
 </body>
 </html>
+
 
