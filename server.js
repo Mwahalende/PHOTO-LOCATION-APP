@@ -169,16 +169,21 @@ function uploadToCloudinary(buffer) {
   });
 }
 
+// Extract public_id from Cloudinary URL
+function extractPublicId(url) {
+  const segments = url.split("/");
+  const fileName = segments[segments.length - 1].split(".")[0];
+  return `geo-photos/${fileName}`;
+}
+
 // POST /upload: Handle photo + metadata upload
 app.post("/upload", upload.single("photo"), async (req, res) => {
   try {
     const { latitude, longitude, placename, timestamp } = req.body;
     if (!req.file) return res.status(400).json({ error: "No photo uploaded" });
 
-    // Upload image buffer to Cloudinary
     const result = await uploadToCloudinary(req.file.buffer);
 
-    // Create photo record
     const newPhoto = new Photo({
       filename: result.secure_url,
       latitude,
@@ -189,7 +194,6 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
 
     await newPhoto.save();
 
-    // Notify all connected clients
     io.emit("newPhoto", {
       filename: newPhoto.filename,
       latitude: newPhoto.latitude,
@@ -223,7 +227,26 @@ app.get("/api/photos", async (req, res) => {
   }
 });
 
+// DELETE /api/photos/:id: Delete photo (admin use)
+app.delete("/api/photos/:id", async (req, res) => {
+  try {
+    const photo = await Photo.findById(req.params.id);
+    if (!photo) return res.status(404).json({ error: "Photo not found" });
+
+    const publicId = extractPublicId(photo.filename);
+    await cloudinary.uploader.destroy(publicId);
+    await photo.deleteOne();
+
+    io.emit("photoDeleted", { id: req.params.id });
+    res.json({ message: "Photo deleted successfully" });
+  } catch (error) {
+    console.error("Delete error:", error);
+    res.status(500).json({ error: "Could not delete photo" });
+  }
+});
+
 // Start Server
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
