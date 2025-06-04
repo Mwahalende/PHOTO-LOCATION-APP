@@ -51,7 +51,7 @@
       right: 20px;
       background: transparent;
       border: 2px solid currentColor;
-      border-radius: 20px;
+      border-radius: 0; /* Removed rounded corners */
       padding: 6px 14px;
       font-size: 14px;
       cursor: pointer;
@@ -79,7 +79,7 @@
     .photo-card {
       position: relative;
       width: 450px;
-      border-radius: 14px;
+      border-radius: 0; /* Removed rounded corners */
       overflow: hidden;
       background-color: var(--card-bg-light);
       box-shadow: 0 6px 18px rgba(0,0,0,0.18);
@@ -96,8 +96,10 @@
       width: 100%;
       height: auto;
       display: block;
-      border-bottom: 1px solid #ccc;
-      border-radius: 14px 14px 0 0;
+      border: 2px solid white;  /* small white border */
+      border-radius: 0;         /* no rounded corners */
+      box-sizing: border-box;   /* include border in size */
+      border-bottom: none;      /* removed border bottom line */
     }
 
     .overlay {
@@ -110,7 +112,7 @@
       padding: 16px;
       font-size: 15px;
       text-align: left;
-      border-radius: 0 0 14px 14px;
+      border-radius: 0; /* Removed rounded corners */
       line-height: 1.3;
     }
 
