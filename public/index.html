@@ -4,50 +4,25 @@
   <meta charset="UTF-8" />
   <title>Geo Photo Capture</title>
   <style>
-    :root {
-      --text-light: #222;
-      --text-dark: #eee;
-      --button-bg-light: #3498db;
-      --button-hover-light: #2980b9;
-      --button-bg-dark: #4a90e2;
-      --button-hover-dark: #357ABD;
-    }
-
+    /* Base styling same as admin.html */
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #dceeff;
-      background-image:
-        radial-gradient(circle at 20% 20%, #cfe9ff 0%, transparent 50%),
-        radial-gradient(circle at 80% 30%, #a7d0ff 0%, transparent 50%),
-        radial-gradient(circle at 50% 80%, #e0f4ff 0%, transparent 50%);
-      background-repeat: repeat;
-      background-size: 400px 400px;
-      color: var(--text-light);
-      text-align: center;
-      padding: 3px;
-      transition: background 0.3s, color 0.3s;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+      color: #222;
       margin: 0;
-    }
-
-    body.dark {
-      background-color: #1e1f26;
-      background-image:
-        radial-gradient(circle at 25% 25%, #2d3a4b 0%, transparent 40%),
-        radial-gradient(circle at 75% 35%, #20334d 0%, transparent 40%),
-        radial-gradient(circle at 50% 80%, #26394e 0%, transparent 40%);
-      background-repeat: repeat;
-      background-size: 400px 400px;
-      color: var(--text-dark);
+      text-align: center;
     }
 
     h1 {
+      text-align: center;
       margin-bottom: 20px;
       user-select: none;
     }
 
     #location, #place {
       font-weight: bold;
-      margin: 5px 0 15px 0;
+      margin: 10px 0 20px 0;
       font-size: 1.1rem;
     }
 
@@ -55,44 +30,37 @@
       width: 450px;
       max-width: 90vw;
       height: auto;
-      border: 4px solid var(--button-bg-light);
-      border-radius: 12px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      border: 4px solid #3498db;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       transition: border-color 0.3s;
     }
 
-    body.dark video {
-      border-color: var(--button-bg-dark);
-    }
-
-    #captureBtn, #galleryBtn, #switchCameraBtn {
+    button {
       margin-top: 20px;
-      padding: 12px 28px;
+      padding: 8px 18px;
       font-size: 16px;
-      background-color: var(--button-bg-light);
-      border: none;
-      border-radius: 10px;
+      background: #e74c3c;
       color: white;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
       user-select: none;
       transition: background-color 0.3s;
       margin-right: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    #captureBtn:hover, #galleryBtn:hover, #switchCameraBtn:hover {
-      background-color: var(--button-hover-light);
+    button:hover {
+      background: #c0392b;
     }
 
-    body.dark #captureBtn, body.dark #galleryBtn, body.dark #switchCameraBtn {
-      background-color: var(--button-bg-dark);
+    #switchCameraBtn {
+      background: #3498db;
     }
 
-    body.dark #captureBtn:hover, body.dark #galleryBtn:hover, body.dark #switchCameraBtn:hover {
-      background-color: var(--button-hover-dark);
-    }
-
-    canvas {
-      display: none;
+    #switchCameraBtn:hover {
+      background: #2980b9;
     }
 
     #toggleThemeBtn {
@@ -100,29 +68,30 @@
       top: 15px;
       right: 20px;
       background: transparent;
-      border: 2px solid currentColor;
+      border: 2px solid #3498db;
       border-radius: 20px;
       padding: 6px 14px;
       font-size: 14px;
       cursor: pointer;
       user-select: none;
       transition: background-color 0.3s, color 0.3s;
+      color: #3498db;
       z-index: 1000;
     }
 
     #toggleThemeBtn:hover {
-      background-color: currentColor;
-      color: var(--text-light);
+      background-color: #3498db;
+      color: white;
     }
 
-    body.dark #toggleThemeBtn:hover {
-      color: var(--text-dark);
+    canvas {
+      display: none;
     }
 
     .main {
-      height: auto;
-      padding: 0px;
-      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0;
     }
   </style>
 </head>
@@ -144,6 +113,7 @@
   </div>
 
   <script>
+    // Your existing JS code remains unchanged
     const locationDiv = document.getElementById("location");
     const placeDiv = document.getElementById("place");
     const video = document.getElementById("video");
@@ -158,17 +128,19 @@
 
     function setTheme(dark) {
       if (dark) {
-        document.body.classList.add("dark");
+        document.body.style.background = "#222";
+        document.body.style.color = "#eee";
         toggleThemeBtn.textContent = "☀️ Light Mode";
       } else {
-        document.body.classList.remove("dark");
+        document.body.style.background = "#f4f4f4";
+        document.body.style.color = "#222";
         toggleThemeBtn.textContent = "🌙 Dark Mode";
       }
       localStorage.setItem("darkMode", dark ? "true" : "false");
     }
 
     toggleThemeBtn.onclick = () => {
-      const dark = !document.body.classList.contains("dark");
+      const dark = localStorage.getItem("darkMode") !== "true";
       setTheme(dark);
     };
 
@@ -245,5 +217,8 @@
   </script>
 </body>
 </html>
+
+
+
 
 
