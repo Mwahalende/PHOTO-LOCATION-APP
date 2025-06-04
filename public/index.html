@@ -24,7 +24,7 @@
       background-size: 400px 400px;
       color: var(--text-light);
       text-align: center;
-      padding: 30px;
+      padding: 3px;
       transition: background 0.3s, color 0.3s;
       margin: 0;
     }
@@ -117,9 +117,15 @@
     body.dark #toggleThemeBtn:hover {
       color: var(--text-dark);
     }
+    .main{
+    height: auto;
+    padding: 0px;
+    width: 100%;
+    }
   </style>
 </head>
 <body>
+  <div class="main">
   <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
 
   <h1>Capture Photo with Location</h1>
@@ -133,6 +139,7 @@
   <button id="captureBtn">Capture Photo</button>
   <button id="galleryBtn" onclick="location.href='photo.html'">View Gallery</button>
 
+  </div>
   <script>
     const locationDiv = document.getElementById("location");
     const placeDiv = document.getElementById("place");
@@ -214,3 +221,4 @@
   </script>
 </body>
 </html>
+
