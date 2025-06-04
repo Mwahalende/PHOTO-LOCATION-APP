@@ -27,8 +27,9 @@
     }
 
     video {
-      width: 100%;
-      height: 450px;
+      width: 450px;
+      max-width: 90vw;
+      height: auto;
       border: 4px solid #3498db;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -86,12 +87,7 @@
     canvas {
       display: none;
     }
-.one{
-  height: auto;
-  border: 2px solid rgba(0, 0, 255, 0);
-  padding: auto;
-  margin: auto;
-}
+
     
   </style>
 </head>
@@ -102,7 +98,7 @@
     <div id="location">Getting location...</div>
     <div id="place"></div>
 
-    <div class="one"><video id="video" autoplay playsinline></video></div>
+    <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
 
     <br />
@@ -216,6 +212,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
