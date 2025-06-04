@@ -27,13 +27,13 @@
     }
 
     video {
-      width: 450px;
-      max-width: 90vw;
-      height: auto;
+      width: 90%;
+      height: 450px;
       border: 4px solid #3498db;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       transition: border-color 0.3s;
+      margin: auto;
     }
 
     button {
@@ -88,15 +88,10 @@
       display: none;
     }
 
-    .main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 0;
-    }
+    
   </style>
 </head>
 <body>
-  <div class="main">
     <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
 
     <h1>Capture Photo with Location</h1>
@@ -110,7 +105,7 @@
     <button id="switchCameraBtn">Switch Camera</button>
     <button id="captureBtn">Capture Photo</button>
     <button id="galleryBtn" onclick="location.href='photo.html'">View Gallery</button>
-  </div>
+  
 
   <script>
     // Your existing JS code remains unchanged
@@ -217,6 +212,9 @@
   </script>
 </body>
 </html>
+
+
+
 
 
 
