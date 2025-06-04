@@ -23,8 +23,6 @@
       background-repeat: repeat;
       background-size: 400px 400px;
       color: var(--text-light);
-      padding: 10px;
-      margin: 0;
       text-align: center;
       transition: background-color 0.3s, color 0.3s;
     }
@@ -46,7 +44,6 @@
     }
 
     #toggleThemeBtn {
-      position: fixed;
       top: 15px;
       right: 20px;
       background: transparent;
@@ -74,20 +71,25 @@
       display: flex;
       flex-wrap: wrap;
       height: auto;
-      justify-content: center;
-      gap:15px;
-      width: 100%;
-      padding: 5px;
+      gap:10px;
       margin: auto;
+      border: 0.4px solid black;
+      padding: 5px;
+      border-radius: 10px;
+      padding-top: 20px;
     }
 
     .photo-card {
-      width: 300px;
+      width: 100%;
+      max-width: 500px;
       position: relative; /* Removed rounded corners */
+      border-radius: 5px;
+      height: 360px;
       overflow: hidden;
       background-color: var(--card-bg-light);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      box-shadow: 3px 3px 3px rgb(28, 28, 28);
       user-select: none;
+      padding: 1px;
       transition: background-color 0.3s, box-shadow 0.3s;
     }
 
@@ -101,7 +103,7 @@
       height: auto;
       display: block;
       border: 2px solid white;  /* small white border */
-      border-radius: 0;         /* no rounded corners */
+      border-radius: 5px;         /* no rounded corners */
       box-sizing: border-box;   /* include border in size */
       border-bottom: none;      /* removed border bottom line */
     }
