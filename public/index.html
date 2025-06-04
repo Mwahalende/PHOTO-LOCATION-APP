@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Geo Photo Capture</title>
+  <style>
+    :root {
+      --text-light: #222;
+      --text-dark: #eee;
+      --button-bg-light: #3498db;
+      --button-hover-light: #2980b9;
+      --button-bg-dark: #4a90e2;
+      --button-hover-dark: #357ABD;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #dceeff;
+      background-image:
+        radial-gradient(circle at 20% 20%, #cfe9ff 0%, transparent 50%),
+        radial-gradient(circle at 80% 30%, #a7d0ff 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, #e0f4ff 0%, transparent 50%);
+      background-repeat: repeat;
+      background-size: 400px 400px;
+      color: var(--text-light);
+      text-align: center;
+      padding: 30px;
+      transition: background 0.3s, color 0.3s;
+      margin: 0;
+    }
+
+    body.dark {
+      background-color: #1e1f26;
+      background-image:
+        radial-gradient(circle at 25% 25%, #2d3a4b 0%, transparent 40%),
+        radial-gradient(circle at 75% 35%, #20334d 0%, transparent 40%),
+        radial-gradient(circle at 50% 80%, #26394e 0%, transparent 40%);
+      background-repeat: repeat;
+      background-size: 400px 400px;
+      color: var(--text-dark);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      user-select: none;
+    }
+
+    #location, #place {
+      font-weight: bold;
+      margin: 5px 0 15px 0;
+      font-size: 1.1rem;
+    }
+
+    video {
+      width: 450px;
+      max-width: 90vw;
+      height: auto;
+      border: 4px solid var(--button-bg-light);
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+      transition: border-color 0.3s;
+    }
+
+    body.dark video {
+      border-color: var(--button-bg-dark);
+    }
+
+    #captureBtn {
+      margin-top: 25px;
+      padding: 14px 32px;
+      font-size: 18px;
+      background-color: var(--button-bg-light);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+
+    #captureBtn:hover {
+      background-color: var(--button-hover-light);
+    }
+
+    body.dark #captureBtn {
+      background-color: var(--button-bg-dark);
+    }
+    body.dark #captureBtn:hover {
+      background-color: var(--button-hover-dark);
+    }
+
+    canvas {
+      display: none;
+    }
+
+    #toggleThemeBtn {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      background: transparent;
+      border: 2px solid currentColor;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s, color 0.3s;
+      z-index: 1000;
+    }
+
+    #toggleThemeBtn:hover {
+      background-color: currentColor;
+      color: var(--text-light);
+    }
+
+    body.dark #toggleThemeBtn:hover {
+      color: var(--text-dark);
+    }
+
+    #preview {
+      margin-top: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      max-width: 90vw;
+      width: 450px;
+      height: auto;
+      display: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
+
+  <h1>Capture Photo with Location</h1>
+  <div id="location">Getting location...</div>
+  <div id="place"></div>
+
+  <video id="video" autoplay playsinline></video>
+  <canvas id="canvas"></canvas>
+
+  <br />
+  <button id="captureBtn">Capture Photo</button>
+
+  <img id="preview" alt="Captured Photo Preview" />
+
+  <script>
+    const locationDiv = document.getElementById("location");
+    const placeDiv = document.getElementById("place");
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const captureBtn = document.getElementById("captureBtn");
+    const previewImg = document.getElementById("preview");
+    const toggleThemeBtn = document.getElementById("toggleThemeBtn");
+
+    let latitude = "", longitude = "", placename = "";
+
+    function setTheme(dark) {
+      if (dark) {
+        document.body.classList.add("dark");
+        toggleThemeBtn.textContent = "☀️ Light Mode";
+      } else {
+        document.body.classList.remove("dark");
+        toggleThemeBtn.textContent = "🌙 Dark Mode";
+      }
+      localStorage.setItem("darkMode", dark ? "true" : "false");
+    }
+
+    toggleThemeBtn.onclick = () => {
+      const dark = !document.body.classList.contains("dark");
+      setTheme(dark);
+    };
+
+    if (localStorage.getItem("darkMode") === "true") {
+      setTheme(true);
+    }
+
+    navigator.geolocation.getCurrentPosition(async position => {
+      latitude = position.coords.latitude.toFixed(6);
+      longitude = position.coords.longitude.toFixed(6);
+      locationDiv.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
+        const data = await res.json();
+        placename = `${data.address.road || "Unknown road"}, ${data.address.city || data.address.town || data.address.village || "Unknown city"}, ${data.address.state || ""}`;
+        placeDiv.textContent = `Place: ${placename}`;
+      } catch {
+        placeDiv.textContent = "Unable to fetch place name.";
+      }
+    }, () => {
+      locationDiv.textContent = "Location access denied.";
+    });
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => video.srcObject = stream)
+      .catch(() => alert("Camera access denied."));
+
+    captureBtn.addEventListener("click", () => {
+      const ctx = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+
+      canvas.toBlob(blob => {
+        previewImg.src = URL.createObjectURL(blob);
+        previewImg.style.display = "block";
+
+        const formData = new FormData();
+        formData.append("photo", blob, "photo.png");
+        formData.append("latitude", latitude);
+        formData.append("longitude", longitude);
+        formData.append("placename", placename);
+        formData.append("timestamp", new Date().toISOString());
+
+        fetch("/upload", {
+          method: "POST",
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert("Photo uploaded successfully!");
+        })
+        .catch(() => alert("Failed to upload photo."));
+      }, "image/png");
+    });
+  </script>
+</body>
+</html>
