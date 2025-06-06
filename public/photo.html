@@ -48,7 +48,7 @@
       right: 20px;
       background: transparent;
       border: 2px solid currentColor;
-      border-radius: 0; /* Removed rounded corners */
+      border-radius: 0;
       padding: 6px 14px;
       font-size: 14px;
       cursor: pointer;
@@ -66,32 +66,31 @@
       color: var(--text-dark);
     }
 
-
     .gallery {
-      display: flex;
-      flex-wrap: wrap;
-      height: auto;
-      gap:10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
       margin: auto;
-      border: 0.4px solid black;
+      padding: 20px;
       border-radius: 10px;
-      padding-top: 20px;
-      width:100%;
+    }
+
+    .photo-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
     }
 
     .photo-card {
       width: 100%;
-      position: relative; /* Removed rounded corners */
       border-radius: 5px;
-      height: auto;
       overflow: hidden;
       background-color: var(--card-bg-light);
       box-shadow: 3px 3px 3px rgb(28, 28, 28);
       user-select: none;
-      padding: 1px;
       transition: background-color 0.3s, box-shadow 0.3s;
-      margin:auto;
-      margin-bottom:25px;
     }
 
     body.dark .photo-card {
@@ -103,23 +102,18 @@
       width: 100%;
       height: auto;
       display: block;
-      border: 2px solid white;  /* small white border */
-      border-radius: 5px;         /* no rounded corners */
-      box-sizing: border-box;   /* include border in size */
-      border-bottom: none;      /* removed border bottom line */
+      border: 2px solid white;
+      border-radius: 5px;
+      box-sizing: border-box;
+      border-bottom: none;
     }
 
     .overlay {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: var(--overlay-bg-light);
-      color: white;
       padding: 16px;
       font-size: 15px;
       text-align: left;
-      border-radius: 0; /* Removed rounded corners */
+      background: var(--overlay-bg-light);
+      color: white;
       line-height: 1.3;
     }
 
@@ -145,15 +139,42 @@
       margin-top: 4px;
       font-style: italic;
     }
-    
+
+    .comment-box {
+      font-size: 15px;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-left: 4px solid #3498db;
+      color: #333;
+      border-radius: 4px;
+      width: 95%;
+    }
+
+    body.dark .comment-box {
+      background-color: #2b2b2b;
+      color: #ccc;
+      border-color: #8ab6f2;
+    }
+
+    /* Optional: force exactly 3 per row on desktop */
+    @media (min-width: 1024px) {
+      .gallery {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .gallery {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
-
-    <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
-    <h1>Captured Photos</h1>
-    <div class="gallery" id="gallery"></div>
-  
+  <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
+  <h1>Captured Photos</h1>
+  <div class="gallery" id="gallery"></div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -180,8 +201,11 @@
       setTheme(true);
     }
 
-    function createPhotoCard({ filename, latitude, longitude, placename, createdAt }) {
+    function createPhotoCard({ filename, latitude, longitude, placename, createdAt, comment }) {
       const dateString = new Date(createdAt).toLocaleString();
+      const wrapper = document.createElement("div");
+      wrapper.className = "photo-wrapper";
+
       const card = document.createElement("div");
       card.className = "photo-card";
       card.innerHTML = `
@@ -192,7 +216,17 @@
           <div class="timestamp">📅 ${dateString}</div>
         </div>
       `;
-      return card;
+
+      wrapper.appendChild(card);
+
+      if (comment) {
+        const commentDiv = document.createElement("div");
+        commentDiv.className = "comment-box";
+        commentDiv.textContent = "📝 " + comment;
+        wrapper.appendChild(commentDiv);
+      }
+
+      return wrapper;
     }
 
     async function loadPhotos() {
