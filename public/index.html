@@ -3,31 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <title>Geo Photo Capture</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    /* Base styling same as admin.html */
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f4f4;
-      padding: 20px;
       color: #222;
-      margin: 0;
-      text-align: center;
+      text-align: left;
+    }
+
+    /* Container with max width for PC, centered */
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
     h1 {
-      text-align: center;
       margin-bottom: 20px;
       user-select: none;
     }
 
     #location, #place {
       font-weight: bold;
-      margin: 10px 0 20px 0;
+      margin: 10px 0;
       font-size: 1.1rem;
     }
 
     video {
-      width: 450px;
+      width: 100%;
       max-width: 90vw;
       height: auto;
       border: 4px solid #3498db;
@@ -36,31 +44,40 @@
       transition: border-color 0.3s;
     }
 
+    #commentInput {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
     button {
-      margin-top: 20px;
-      padding: 8px 18px;
+      margin-top: 15px;
+      padding: 10px 20px;
       font-size: 16px;
-      background: #e74c3c;
+      background: #e74c3c; /* red */
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      user-select: none;
       transition: background-color 0.3s;
       margin-right: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
 
     button:hover {
-      background: #c0392b;
+      background: #c0392b; /* darker red */
     }
 
     #switchCameraBtn {
-      background: #3498db;
+      background: #3498db; /* blue */
     }
 
     #switchCameraBtn:hover {
-      background: #2980b9;
+      background: #2980b9; /* darker blue */
     }
 
     #toggleThemeBtn {
@@ -73,7 +90,6 @@
       padding: 6px 14px;
       font-size: 14px;
       cursor: pointer;
-      user-select: none;
       transition: background-color 0.3s, color 0.3s;
       color: #3498db;
       z-index: 1000;
@@ -88,10 +104,60 @@
       display: none;
     }
 
-    
+    /* Mobile fullscreen camera & layout */
+    @media (max-width: 768px) {
+      .container {
+        max-width: 100vw;
+        margin: 0;
+        padding: 10px;
+        align-items: flex-start;
+      }
+
+      video {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        border: none;
+        border-radius: 0;
+        margin: 0;
+      }
+
+      #toggleThemeBtn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+
+      h1, #location, #place, #commentInput, button {
+        position: relative;
+        z-index: 2;
+        background: rgba(255,255,255,0.8);
+        margin: 10px auto;
+        width: 90%;
+        border-radius: 6px;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+
+      #commentInput {
+        width: 90%;
+      }
+    }
+
+    /* Dark mode */
+    body.dark-mode {
+      background: #222;
+      color: #eee;
+    }
+
+    body.dark-mode button {
+      box-shadow: 0 2px 5px rgba(255,255,255,0.15);
+      color: white;
+    }
   </style>
 </head>
 <body>
+  <div class="container">
     <button id="toggleThemeBtn" aria-label="Toggle Dark/Light Mode">🌙 Dark Mode</button>
 
     <h1>Capture Photo with Location</h1>
@@ -101,14 +167,14 @@
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
 
-    <br />
+    <input type="text" id="commentInput" placeholder="Enter photo description (optional)" />
+
     <button id="switchCameraBtn">Switch Camera</button>
     <button id="captureBtn">Capture Photo</button>
     <button id="galleryBtn" onclick="location.href='photo.html'">View Gallery</button>
-  
+  </div>
 
   <script>
-    // Your existing JS code remains unchanged
     const locationDiv = document.getElementById("location");
     const placeDiv = document.getElementById("place");
     const video = document.getElementById("video");
@@ -116,6 +182,7 @@
     const captureBtn = document.getElementById("captureBtn");
     const toggleThemeBtn = document.getElementById("toggleThemeBtn");
     const switchCameraBtn = document.getElementById("switchCameraBtn");
+    const commentInput = document.getElementById("commentInput");
 
     let latitude = "", longitude = "", placename = "";
     let currentFacingMode = "environment";
@@ -123,12 +190,10 @@
 
     function setTheme(dark) {
       if (dark) {
-        document.body.style.background = "#222";
-        document.body.style.color = "#eee";
+        document.body.classList.add("dark-mode");
         toggleThemeBtn.textContent = "☀️ Light Mode";
       } else {
-        document.body.style.background = "#f4f4f4";
-        document.body.style.color = "#222";
+        document.body.classList.remove("dark-mode");
         toggleThemeBtn.textContent = "🌙 Dark Mode";
       }
       localStorage.setItem("darkMode", dark ? "true" : "false");
@@ -194,6 +259,7 @@
         formData.append("longitude", longitude);
         formData.append("placename", placename);
         formData.append("timestamp", new Date().toISOString());
+        formData.append("comment", commentInput.value);
 
         fetch("/upload", {
           method: "POST",
@@ -202,6 +268,7 @@
         .then(res => res.json())
         .then(data => {
           alert("Photo uploaded successfully!");
+          commentInput.value = "";
         })
         .catch(() => alert("Failed to upload photo."));
       }, "image/png");
