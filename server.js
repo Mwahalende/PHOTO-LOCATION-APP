@@ -127,7 +127,7 @@ cloudinary.config({
 });
 
 // MongoDB Connection
-mongoose.connect("mongodb+srv://user1:malafiki@leodb.5mf7q.mongodb.net/mediaz?retryWrites=true&w=majority&appName=leodb")
+mongoose.connect("mongodb://127.0.0.1:27017/photoApp")
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.error("MongoDB connection error:", err));
 
@@ -137,6 +137,7 @@ const photoSchema = new mongoose.Schema({
   latitude: String,
   longitude: String,
   placename: String,
+  comment: String,          // <-- ADDED
   createdAt: { type: Date, default: Date.now }
 });
 const Photo = mongoose.model("Photo", photoSchema);
@@ -179,7 +180,8 @@ function extractPublicId(url) {
 // POST /upload: Handle photo + metadata upload
 app.post("/upload", upload.single("photo"), async (req, res) => {
   try {
-    const { latitude, longitude, placename, timestamp } = req.body;
+    const { latitude, longitude, placename, timestamp, comment } = req.body; // <-- comment included
+
     if (!req.file) return res.status(400).json({ error: "No photo uploaded" });
 
     const result = await uploadToCloudinary(req.file.buffer);
@@ -189,16 +191,19 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
       latitude,
       longitude,
       placename,
+      comment, // <-- SAVE comment
       createdAt: timestamp ? new Date(timestamp) : Date.now()
     });
 
     await newPhoto.save();
 
     io.emit("newPhoto", {
+      _id: newPhoto._id,
       filename: newPhoto.filename,
       latitude: newPhoto.latitude,
       longitude: newPhoto.longitude,
       placename: newPhoto.placename,
+      comment: newPhoto.comment, // <-- EMIT comment
       createdAt: newPhoto.createdAt
     });
 
@@ -208,6 +213,7 @@ app.post("/upload", upload.single("photo"), async (req, res) => {
       latitude: newPhoto.latitude,
       longitude: newPhoto.longitude,
       placename: newPhoto.placename,
+      comment: newPhoto.comment, // <-- RETURN comment
       createdAt: newPhoto.createdAt
     });
   } catch (error) {
@@ -249,4 +255,3 @@ app.delete("/api/photos/:id", async (req, res) => {
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
-
